@@ -1,0 +1,3 @@
+[submodule "external/mapstraction"]
+	path = external/mapstraction
+	url = https://github.com/mapstraction/mxn.git
