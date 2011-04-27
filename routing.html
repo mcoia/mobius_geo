@@ -1,0 +1,58 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Mapstraction Examples - google v2</title>
+<script type="text/javascript" src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAOuT7g0tech-PRkEZtKf1AhT2yXp_ZAY8_ufC3CFXhHIE1NvwkxR2EL0WYFwcRAufRtBM9W65uD4oQw"></script>
+<script src="external/mapstraction/source/mxn.js?(google)" type="text/javascript"></script> 
+<style type="text/css">
+#mapdiv {
+  height: 400px;
+}
+</style> 
+<script type="text/javascript">
+//<![CDATA[
+  function initialize() {
+
+      // create mxn object
+      var m = new mxn.Mapstraction('mapdiv','google');
+
+      m.addControls({zoom:'small'});
+      
+     // m.addOverlay("http://mobiusconsortium.org/libraries.kml");
+
+      var latlon = new mxn.LatLonPoint(38.943785538, -92.3272834449);
+
+      // put map on page
+      m.setCenterAndZoom(latlon, 8);
+
+      // add a marker
+      var marker = new mxn.Marker(latlon);
+     // m.addMarker(marker,true);
+            
+  }
+  navigator.geolocation.getCurrentPosition(foundLoc, noLoc);
+  
+  function foundLoc(pos) {
+    var lat = pos.coords.latitude;
+    var lon = pos.coords.longitude;
+    alert(' Found location: ' + lat + ' , ' + lon);
+    var userpos = new mxn.LatLonPoint(lat, lon);
+    var usermark = new mxn.Marker(userpos);
+    m.addMarker(usermark,true);
+    m.setCenterAndZoom(usermark, 12);
+  }
+  function noLoc() {
+    alert(' Could not find location' );
+  }
+  
+//]]>
+</script> 
+</head>
+<body onload="initialize();">
+<center>
+<table border='1' width='50%'>
+<tr><td><div id="mapdiv"></div></td>
+</tr>
+</table>
+</center>
+</body>
+</html>
