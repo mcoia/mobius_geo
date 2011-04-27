@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Mapstraction Examples - google v2</title>
-<script type="text/javascript" src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAOuT7g0tech-PRkEZtKf1AhT2yXp_ZAY8_ufC3CFXhHIE1NvwkxR2EL0WYFwcRAufRtBM9W65uD4oQw"></script>
+<script type="text/javascript" src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=true&amp;key=ABQIAAAAOuT7g0tech-PRkEZtKf1AhT2yXp_ZAY8_ufC3CFXhHIE1NvwkxR2EL0WYFwcRAufRtBM9W65uD4oQw"></script>
 <script src="external/mapstraction/source/mxn.js?(google)" type="text/javascript"></script> 
 <style type="text/css">
 #mapdiv {
@@ -10,39 +10,64 @@
 </style> 
 <script type="text/javascript">
 //<![CDATA[
-  function initialize() {
 
-      // create mxn object
-      var m = new mxn.Mapstraction('mapdiv','google');
-
-      m.addControls({zoom:'small'});
-      
-     // m.addOverlay("http://mobiusconsortium.org/libraries.kml");
-
-      var latlon = new mxn.LatLonPoint(38.943785538, -92.3272834449);
-
-      // put map on page
-      m.setCenterAndZoom(latlon, 8);
-
-      // add a marker
-      var marker = new mxn.Marker(latlon);
-     // m.addMarker(marker,true);
-            
+var m
+function initialize() {     
+     navigator.geolocation.getCurrentPosition(foundLoc, noLoc);           
   }
-  navigator.geolocation.getCurrentPosition(foundLoc, noLoc);
-  
-  function foundLoc(pos) {
+
+
+
+function foundLoc(pos) {
+    m = new mxn.Mapstraction('mapdiv','google');
+    m.addControls({zoom:'small'});
+    m.addOverlay("http://mobiusconsortium.org/libraries.kml");
+    
     var lat = pos.coords.latitude;
     var lon = pos.coords.longitude;
     alert(' Found location: ' + lat + ' , ' + lon);
     var userpos = new mxn.LatLonPoint(lat, lon);
     var usermark = new mxn.Marker(userpos);
     m.addMarker(usermark,true);
-    m.setCenterAndZoom(usermark, 12);
-  }
-  function noLoc() {
+    m.setCenterAndZoom(userpos, 16);
+
+    // var bounds = new mxn.BoundingBox(32.4, -113.9, 40.9, -103.0);
+    // for (i=1; i<=5; i++) {
+    //   var marker = new mxn.Marker(get_random_by_bounds(bounds));
+    //   m.addMarker(marker);
+    // }
+    // m.setBounds(bounds);
+    m.click.addHandler(find_closest_marker);
+}
+  
+function noLoc() {
     alert(' Could not find location' );
   }
+// function get_random_by_bounds(bounds) {
+//   var lat = bounds.sw.lat + (Math.random() * (bounds.ne.lat - bounds.sw.lat));
+//   var lon = bounds.sw.lon + (Math.random() * (bounds.ne.lon - bounds.sw.lon));
+//   return new mxn.LatLonPoint(lat, lon);
+// }
+
+function find_closest_marker(event_type, event_source, event_args) {
+  if (m.markers.length > 0) {
+    var clickpoint = event_args.location;
+    var closest_marker = m.markers[0] ;
+    var closest_dist = clickpoint.distance(closest_marker.location);
+     for (var i=1; i < m.markers.length; i++) {
+      var thismarker = m.markers[i] ;
+      var thisdist = clickpoint.distance(thismarker.location);
+       if (thisdist < closest_dist) {
+        closest_dist = thisdist;
+        closest_marker = thismarker;
+      }
+    }
+    if (closest_marker) {
+       var poly = new mxn.Polyline([clickpoint, closest_marker.location]) ;
+       m.addPolyline(poly);
+    }
+  }
+}
   
 //]]>
 </script> 
