@@ -64,36 +64,27 @@
       var lat = pos.coords.latitude;
       var lon = pos.coords.longitude;
       alert(' Found location: ' + lat + ' , ' + lon);
-      var userpos = new mxn.LatLonPoint(lat, lon);
-      var usermark = new mxn.Marker(userpos);
-      map.addMarker(usermark,true);
-      map.setCenterAndZoom(userpos, 16);
+      var userpos = new google.maps.LatLng(lat, lon);
+      var usermark = new google.maps.Marker({
+        position: userpos,
+        map: map,
+        title: "UR HERE"
+      });
+      map.setCenter(userpos);
+      map.setZoom(16);
 
-      map.click.addHandler(find_closest_marker);
+      google.maps.event.addListener(map, 'click', find_closest_marker(userpos));
   }
 
   function noLoc() {
       alert(' Could not find location' );
     }
 
-  function find_closest_marker(event_type, event_source, event_args) {
-    if (map.markers.length > 0) {
-      var clickpoint = event_args.location;
-      var closest_marker = map.markers[0] ;
-      var closest_dist = clickpoint.distance(closest_marker.location);
-       for (var i=1; i < map.markers.length; i++) {
-        var thismarker = map.markers[i] ;
-        var thisdist = clickpoint.distance(thismarker.location);
-         if (thisdist < closest_dist) {
-          closest_dist = thisdist;
-          closest_marker = thismarker;
-        }
-      }
-      if (closest_marker) {
-         var poly = new mxn.Polyline([clickpoint, closest_marker.location]) ;
-         map.addPolyline(poly);
-      }
-    }
+  function find_closest_marker(userpos) {
+    var nearest = new google.maps.Marker({
+      query: "SELECT * FROM 764441 ORDER BY ST_DISTANCE(location, userpos), LIMIT 1",
+      map: map
+    })
   }
   </script>
 
